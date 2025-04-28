@@ -1,6 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductService } from '../../services/product.service';
 
+interface Product {
+  productId: number;
+  productName: string;
+  productPrice: number;
+  productImageUrl: string;
+}
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -8,37 +15,45 @@ import { ProductService } from '../../services/product.service';
 })
 export class HomeComponent implements OnInit {
 
-  productList: any[] = [];
-  cartObj: any = {
-    "CartId": 0,
-    "CustId": 1,
-    "ProductId": 0,
-    "Quantity": 0,
-    "AddedDate": "2023-04-27T07:12:40.926Z"
-  };
-  constructor(private productService: ProductService) {
+  productList: Product[] = [];
 
-  }
+  cartObj = {
+    CartId: 0,
+    CustId: 1,
+    ProductId: 0,
+    Quantity: 1,
+    AddedDate: new Date().toISOString()  // auto-set current date
+  };
+
+  constructor(private productService: ProductService) {}
+
   ngOnInit(): void {
-    debugger;
     this.loadAllProducts();
   }
 
-  loadAllProducts() {
-    debugger;
-    this.productService.getAllProducts().subscribe((result: any) => {
-      this.productList = result.data;
-    })
+  loadAllProducts(): void {
+    this.productService.getAllProducts().subscribe({
+      next: (result: any) => {
+        this.productList = result.data;
+      },
+      error: (error) => {
+        console.error('Failed to load products:', error);
+      }
+    });
   }
 
-  addItemToCart(productId: number) {
-    debugger;
+  addItemToCart(productId: number): void {
     this.cartObj.ProductId = productId;
-    this.productService.addToCart(this.cartObj).subscribe((result: any) => {
-      if (result.result) {
-        alert("Product Added To Cart");
-        this.productService.cartAddedSubject.next(true);
+    this.productService.addToCart(this.cartObj).subscribe({
+      next: (result: any) => {
+        if (result.result) {
+          alert('Product Added To Cart');
+          this.productService.cartAddedSubject.next(true);
+        }
+      },
+      error: (error) => {
+        console.error('Failed to add product to cart:', error);
       }
-    })
+    });
   }
 }

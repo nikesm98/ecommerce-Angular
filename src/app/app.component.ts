@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
-// import { ProductService } from './services/product.service';
+import { ProductService } from '../../src/app/services/product.service';
 
 @Component({
   selector: 'app-root',
@@ -15,11 +15,11 @@ export class AppComponent implements OnInit {
   cartProducts: any[] = [];
   subTotal: number = 0;
 
-  // constructor(private productService: ProductService, private router: Router) {
-  //   this.productService.cartAddedSubject.subscribe(res => {
-  //     this.loadCart();
-  //   });
-  // }
+  constructor(private productService: ProductService, private router: Router) {
+    this.productService.cartAddedSubject.subscribe(res => {
+      this.loadCart();
+    });
+  }
 
   ngOnInit(): void {
     this.loadCart();
